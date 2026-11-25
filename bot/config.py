@@ -30,16 +30,53 @@ def _google_news(busca: str) -> str:
             "&hl=pt-BR&gl=BR&ceid=BR:pt-419")
 
 NICHOS = {
-    "MERCADO":          [_google_news("Ibovespa OR bolsa OR dólar OR ações")],
-    "ECONOMIA":         [_google_news("economia brasileira OR inflação OR juros OR Selic OR PIB")],
-    "EMPREENDEDORISMO": [_google_news("empreendedorismo OR startup OR pequenas empresas OR franquia")],
-    "NEGÓCIOS":         [_google_news("empresa lucro OR aquisição OR fusão OR varejo OR faturamento")],
-    "AUTOMOTIVO":       [_google_news("montadora OR carro elétrico OR lançamento carro OR mercado automotivo")],
-    "IMOBILIÁRIO":      [_google_news("mercado imobiliário OR financiamento imobiliário OR construtora OR aluguel")],
-    "IA":               [_google_news("inteligência artificial OR OpenAI OR Anthropic OR Nvidia OR IA generativa")],
-    "POLÍTICA":         [_google_news("Congresso economia OR reforma tributária OR ajuste fiscal OR orçamento federal OR Ministério da Fazenda OR imposto aprovado")],
-    "CRIPTO":           [_google_news("bitcoin OR criptomoedas OR ethereum OR stablecoin OR cripto")],
+    "MERCADO": [
+        _google_news("Ibovespa OR bolsa OR dólar OR ações"),
+        "https://www.infomoney.com.br/mercados/feed/",
+        "https://www.moneytimes.com.br/feed/",
+    ],
+    "ECONOMIA": [
+        _google_news("economia brasileira OR inflação OR juros OR Selic OR PIB"),
+        "https://g1.globo.com/rss/g1/economia/",
+        "https://www.infomoney.com.br/economia/feed/",
+    ],
+    "EMPREENDEDORISMO": [
+        _google_news("empreendedorismo OR startup OR pequenas empresas OR franquia"),
+        "https://startups.com.br/feed/",
+        "https://exame.com/pme/feed/",
+    ],
+    "NEGÓCIOS": [
+        _google_news("empresa lucro OR aquisição OR fusão OR varejo OR faturamento"),
+        "https://www.infomoney.com.br/negocios/feed/",
+        "https://exame.com/negocios/feed/",
+    ],
+    "AUTOMOTIVO": [
+        _google_news("montadora OR carro elétrico OR lançamento carro OR mercado automotivo"),
+        "https://autopapo.uol.com.br/feed/",
+        "https://motor1.uol.com.br/rss/news/all/",
+    ],
+    "IMOBILIÁRIO": [
+        _google_news("mercado imobiliário OR financiamento imobiliário OR construtora OR aluguel"),
+        "https://www.infomoney.com.br/minhas-financas/imoveis/feed/",
+    ],
+    "IA": [
+        _google_news("inteligência artificial OR OpenAI OR Anthropic OR Nvidia OR IA generativa"),
+        "https://www.tecmundo.com.br/inteligencia-artificial/rss",
+        "https://canaltech.com.br/rss/",
+    ],
+    "POLÍTICA": [
+        _google_news("Congresso economia OR reforma tributária OR ajuste fiscal OR orçamento federal OR Ministério da Fazenda OR imposto aprovado"),
+        "https://www.poder360.com.br/feed/",
+        "https://g1.globo.com/rss/g1/politica/",
+    ],
+    "CRIPTO": [
+        _google_news("bitcoin OR criptomoedas OR ethereum OR stablecoin OR cripto"),
+        "https://livecoins.com.br/feed/",
+        "https://portaldobitcoin.uol.com.br/feed/",
+    ],
 }
+# Notícias mais antigas que isso são ignoradas (horas)
+IDADE_MAXIMA_HORAS = 12
 
 # ---------------------------------------------------------------
 # 3. RITMO DE POSTAGEM

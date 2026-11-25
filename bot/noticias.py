@@ -6,6 +6,7 @@ import unicodedata
 from pathlib import Path
 
 import feedparser
+import requests
 
 from . import config
 
@@ -40,12 +41,35 @@ def salvar_no_historico(titulo: str, nicho: str, manchete: str) -> None:
                                  encoding="utf-8")
 
 
+NAVEGADOR = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+             "(KHTML, like Gecko) Chrome/130.0 Safari/537.36")
+
+
+def _baixar_feed(url: str):
+    """Baixa um feed RSS. Se a fonte falhar, avisa no log e segue com as outras."""
+    site = url.split("/")[2]
+    try:
+        r = requests.get(url, headers={"User-Agent": NAVEGADOR}, timeout=20)
+        if r.status_code != 200:
+            print(f"   fonte {site}: erro HTTP {r.status_code}")
+            return None
+        feed = feedparser.parse(r.content)
+        print(f"   fonte {site}: {len(feed.entries)} itens")
+        return feed
+    except Exception as erro:
+        print(f"   fonte {site}: falhou ({type(erro).__name__})")
+        return None
+
+
 def coletar(nicho: str, limite: int = 10) -> list[dict]:
     """Retorna até `limite` notícias inéditas do nicho, da mais nova para a mais antiga."""
     vistos = [_normalizar(h["titulo"]) for h in carregar_historico()]
     itens = []
+    limite_idade = time.time() - config.IDADE_MAXIMA_HORAS * 3600
     for url in config.NICHOS[nicho]:
-        feed = feedparser.parse(url)
+        feed = _baixar_feed(url)
+        if feed is None:
+            continue
         for e in feed.entries:
             titulo = e.get("title", "")
             fonte = ""
@@ -57,7 +81,9 @@ def coletar(nicho: str, limite: int = 10) -> list[dict]:
                 fonte = fonte or sufixo
             resumo = re.sub(r"<[^>]+>", " ", e.get("summary", ""))
             resumo = re.sub(r"\s+", " ", resumo).strip()
-            data = e.get("published_parsed") or time.gmtime()
+            data = e.get("published_parsed") or e.get("updated_parsed") or time.gmtime()
+            if time.mktime(data) < limite_idade:
+                continue
             chave = _normalizar(titulo)
             if any(_parecido(chave, v) for v in vistos):
                 continue
