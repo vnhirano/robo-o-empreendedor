@@ -11,7 +11,7 @@ import os
 # 1. IDENTIDADE DO PERFIL
 # ---------------------------------------------------------------
 NOME_PERFIL = "O EMPREENDEDOR"
-ARROBA = "@oempreendedor"          # troque pelo @ real quando criar a conta
+ARROBA = "@_O_Empreendedor"
 
 # Cores da marca (formato hexadecimal)
 COR_FUNDO = "#0B0F14"      # quase preto
