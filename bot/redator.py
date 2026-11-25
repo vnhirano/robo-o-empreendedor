@@ -58,7 +58,8 @@ def escrever(noticias: list[dict], nicho: str) -> dict:
         messages=[{"role": "user",
                    "content": f"Nicho: {nicho}\n\nNotícias disponíveis:\n{_lista(noticias)}"}],
     )
-    texto = resposta.content[0].text
+    # a resposta pode trazer blocos de "raciocínio" antes do texto; pegamos só o texto
+    texto = "".join(b.text for b in resposta.content if getattr(b, "type", "") == "text")
     bloco = re.search(r"\{.*\}", texto, re.S)
     dados = json.loads(bloco.group(0))
     dados["escolha"] = max(0, min(int(dados.get("escolha", 0)), len(noticias) - 1))
