@@ -61,7 +61,10 @@ def _baixar_feed(url: str):
         return None
 
 
-def coletar(nicho: str, limite: int = 10) -> list[dict]:
+POR_FONTE = 4   # no máximo 4 notícias de cada fonte, para misturar Brasil e exterior
+
+
+def coletar(nicho: str, limite: int = 15) -> list[dict]:
     """Retorna até `limite` notícias inéditas do nicho, da mais nova para a mais antiga."""
     vistos = [_normalizar(h["titulo"]) for h in carregar_historico()]
     itens = []
@@ -70,13 +73,18 @@ def coletar(nicho: str, limite: int = 10) -> list[dict]:
         feed = _baixar_feed(url)
         if feed is None:
             continue
-        for e in feed.entries:
+        do_feed = 0
+        entradas = sorted(feed.entries, key=lambda e: time.mktime(
+            e.get("published_parsed") or e.get("updated_parsed") or time.gmtime()), reverse=True)
+        for e in entradas:
+            if do_feed >= POR_FONTE:
+                break
             titulo = e.get("title", "")
             fonte = ""
             if "source" in e and hasattr(e.source, "get"):
                 fonte = e.source.get("title", "")
             # O Google Notícias coloca " - Nome do Site" no fim do título
-            if " - " in titulo:
+            if "news.google" in url and " - " in titulo:
                 titulo, sufixo = titulo.rsplit(" - ", 1)
                 fonte = fonte or sufixo
             resumo = re.sub(r"<[^>]+>", " ", e.get("summary", ""))
@@ -89,6 +97,9 @@ def coletar(nicho: str, limite: int = 10) -> list[dict]:
                 continue
             if any(_parecido(chave, _normalizar(i["titulo"])) for i in itens):
                 continue
+            do_feed += 1
+            if not fonte:  # portais diretos: usa o nome do próprio feed
+                fonte = feed.feed.get("title", "").split(" - ")[0].split(" | ")[0]
             itens.append({"titulo": titulo.strip(), "fonte": fonte.strip() or "Imprensa",
                           "resumo": resumo[:400], "link": e.get("link", ""),
                           "data": time.mktime(data), "nicho": nicho})

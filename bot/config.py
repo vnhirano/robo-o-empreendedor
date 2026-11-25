@@ -29,11 +29,21 @@ def _google_news(busca: str) -> str:
     return (f"https://news.google.com/rss/search?q={quote(busca)}+when:6h"
             "&hl=pt-BR&gl=BR&ceid=BR:pt-419")
 
+def _google_news_en(busca: str) -> str:
+    """Google Notícias em inglês (EUA), para notícias internacionais."""
+    from urllib.parse import quote
+    return (f"https://news.google.com/rss/search?q={quote(busca)}+when:6h"
+            "&hl=en-US&gl=US&ceid=US:en")
+
+
 NICHOS = {
     "MERCADO": [
         _google_news("Ibovespa OR bolsa OR dólar OR ações"),
         "https://www.infomoney.com.br/mercados/feed/",
         "https://www.moneytimes.com.br/feed/",
+        _google_news_en("stock market OR Wall Street OR Fed OR S&P 500 OR Nasdaq"),
+        "https://www.cnbc.com/id/15839069/device/rss/rss.html",
+        "https://feeds.content.dowjones.io/public/rss/mw_topstories",
     ],
     "ECONOMIA": [
         _google_news("economia brasileira OR inflação OR juros OR Selic OR PIB"),
@@ -49,11 +59,15 @@ NICHOS = {
         _google_news("empresa lucro OR aquisição OR fusão OR varejo OR faturamento"),
         "https://www.infomoney.com.br/negocios/feed/",
         "https://exame.com/negocios/feed/",
+        _google_news_en("earnings OR acquisition OR merger OR CEO OR layoffs big tech"),
+        "https://feeds.bbci.co.uk/news/business/rss.xml",
     ],
     "AUTOMOTIVO": [
         _google_news("montadora OR carro elétrico OR lançamento carro OR mercado automotivo"),
         "https://autopapo.uol.com.br/feed/",
         "https://motor1.uol.com.br/rss/news/all/",
+        _google_news_en("Tesla OR BYD OR Toyota OR automaker OR electric vehicles"),
+        "https://electrek.co/feed/",
     ],
     "IMOBILIÁRIO": [
         _google_news("mercado imobiliário OR financiamento imobiliário OR construtora OR aluguel"),
@@ -63,6 +77,8 @@ NICHOS = {
         _google_news("inteligência artificial OR OpenAI OR Anthropic OR Nvidia OR IA generativa"),
         "https://www.tecmundo.com.br/inteligencia-artificial/rss",
         "https://canaltech.com.br/rss/",
+        _google_news_en("artificial intelligence OR OpenAI OR Anthropic OR Nvidia OR Google AI"),
+        "https://techcrunch.com/category/artificial-intelligence/feed/",
     ],
     "POLÍTICA": [
         _google_news("Congresso economia OR reforma tributária OR ajuste fiscal OR orçamento federal OR Ministério da Fazenda OR imposto aprovado"),
@@ -73,6 +89,15 @@ NICHOS = {
         _google_news("bitcoin OR criptomoedas OR ethereum OR stablecoin OR cripto"),
         "https://livecoins.com.br/feed/",
         "https://portaldobitcoin.uol.com.br/feed/",
+        _google_news_en("bitcoin OR crypto OR ethereum OR stablecoin OR SEC crypto"),
+        "https://www.coindesk.com/arc/outboundfeeds/rss/",
+        "https://cointelegraph.com/rss",
+    ],
+    "GEOPOLÍTICA": [
+        _google_news("geopolítica OR guerra comercial OR tarifas OR sanções OR China Estados Unidos"),
+        _google_news_en("geopolitics OR tariffs OR sanctions OR trade war OR OPEC OR China US"),
+        "https://feeds.bbci.co.uk/news/world/rss.xml",
+        "https://www.aljazeera.com/xml/rss/all.xml",
     ],
 }
 # Notícias mais antigas que isso são ignoradas (horas)

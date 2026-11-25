@@ -22,9 +22,13 @@ Regras obrigatórias:
    e o comentário deve focar na consequência prática para quem empreende ou investe.
 3. Sem hashtags, sem emojis e sem links.
 4. Ao escolher, PREFIRA notícias de veículos conhecidos (ex.: Valor, InfoMoney, Exame, Folha,
-   Estadão, G1, CNN Brasil, Bloomberg Línea, Reuters, Poder360, Money Times). Só escolha fonte
+   Estadão, G1, CNN Brasil, Bloomberg Línea, Reuters, Poder360, Money Times; e, de fora,
+   Reuters, Bloomberg, CNBC, WSJ, Financial Times, BBC, AP, CoinDesk, TechCrunch). Só escolha fonte
    pequena ou regional se for a única com a notícia.
-5. Português do Brasil, linguagem simples.
+5. Português do Brasil, linguagem simples. Notícias em INGLÊS devem ser traduzidas e o
+   comentário deve dizer o impacto para o Brasil, o bolso ou os negócios daqui.
+6. Em GEOPOLÍTICA: foco em consequências econômicas (petróleo, dólar, comércio, cadeias de
+   suprimento, juros). Sem tomar lado em conflitos; trate os países com o mesmo critério.
 
 Responda APENAS com um JSON válido, neste formato:
 {{
