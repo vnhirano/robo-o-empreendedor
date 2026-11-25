@@ -78,6 +78,37 @@ NOMES_FONTES = {
     "portaldobitcoin.uol.com.br": "Portal do Bitcoin",
 }
 
+# LISTA DE VEÍCULOS CONFIÁVEIS (para notícias que vêm do Google Notícias).
+# Só passam notícias cujo veículo comece com um destes nomes. Para incluir um veículo, adicione aqui.
+FONTES_CONFIAVEIS = [
+    # Brasil
+    "valor", "infomoney", "exame", "folha de s.paulo", "folha de s. paulo", "estadao", "estadão",
+    "e-investidor", "o globo", "g1", "cnn brasil", "bloomberg linea", "bloomberg línea", "poder360",
+    "money times", "metropoles", "metrópoles", "uol", "veja", "epoca negocios", "época negócios",
+    "pequenas empresas", "pegn", "forbes", "neofeed", "brazil journal", "seu dinheiro",
+    "agencia brasil", "agência brasil", "bbc", "investing.com", "correio braziliense", "jovem pan",
+    "band", "sbt news", "terra", "autoesporte", "quatro rodas", "motor1", "autopapo", "tecmundo",
+    "canaltech", "olhar digital", "startups", "startse", "livecoins", "portal do bitcoin",
+    "cointelegraph", "gazeta do povo", "valor investe", "istoe dinheiro", "istoé dinheiro",
+    "o estado de s. paulo", "cbn", "globonews", "jota", "agencia senado", "agência senado",
+    "agencia camara", "agência câmara", "infomoney", "suno", "the shift", "mobile time",
+    # Exterior
+    "reuters", "bloomberg", "cnbc", "the wall street journal", "wsj", "financial times",
+    "the new york times", "new york times", "the washington post", "associated press", "ap news",
+    "the guardian", "the economist", "fortune", "business insider", "axios", "politico",
+    "techcrunch", "the verge", "wired", "ars technica", "coindesk", "the block", "decrypt",
+    "electrek", "marketwatch", "barron's", "yahoo finance", "al jazeera", "nikkei", "south china morning post",
+    "deutsche welle", "dw", "le monde", "el pais", "el país", "euronews", "sky news", "npr",
+    "cbs news", "abc news", "nbc news", "fox business", "the information", "semafor", "cnn",
+]
+
+
+def _fonte_confiavel(fonte: str) -> bool:
+    f = fonte.strip().lower()
+    return any(f == a or f.startswith(a + " ") or f.startswith(a + ":") or f.startswith(a + ">")
+               or f.startswith(a + ".") or f.startswith(a + "-") for a in FONTES_CONFIAVEIS)
+
+
 POR_FONTE = 4   # no máximo 4 notícias de cada fonte, para misturar Brasil e exterior
 
 
@@ -119,6 +150,9 @@ def coletar(nicho: str, limite: int = 15) -> list[dict]:
                 fonte = NOMES_FONTES.get(url.split("/")[2]) or \
                     feed.feed.get("title", "").split(" - ")[0].split(" | ")[0]
             if fonte.strip().lower() in FONTES_BLOQUEADAS:
+                continue
+            # notícias do Google Notícias só entram se o veículo estiver na lista de confiáveis
+            if "news.google" in url and not _fonte_confiavel(fonte):
                 continue
             itens.append({"titulo": titulo.strip(), "fonte": fonte.strip() or "Imprensa",
                           "resumo": resumo[:400], "link": e.get("link", ""),
