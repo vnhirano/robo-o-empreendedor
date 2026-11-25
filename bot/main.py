@@ -9,6 +9,7 @@ Uso:
   python -m bot.main            -> rodada normal (é o que o GitHub executa)
   python -m bot.main --teste    -> gera um vídeo de exemplo, sem internet e sem postar
 """
+import os
 import sys
 import time
 from pathlib import Path
@@ -51,7 +52,8 @@ def rodada_teste() -> None:
 
 def rodada() -> None:
     hora = hora_brasilia()
-    if not (config.HORA_INICIO <= hora <= config.HORA_FIM):
+    forcar = os.getenv("FORCAR", "nao").lower() == "sim"
+    if not forcar and not (config.HORA_INICIO <= hora <= config.HORA_FIM):
         print(f"Fora do horário de postagem ({hora}h). Nada a fazer.")
         return
 
