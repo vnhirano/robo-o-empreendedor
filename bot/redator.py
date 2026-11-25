@@ -53,7 +53,7 @@ def escrever(noticias: list[dict], nicho: str) -> dict:
     cliente = anthropic.Anthropic()
     resposta = cliente.messages.create(
         model=config.MODELO_IA,
-        max_tokens=600,
+        max_tokens=4000,   # folga para o modelo "pensar" antes de responder
         system=INSTRUCOES,
         messages=[{"role": "user",
                    "content": f"Nicho: {nicho}\n\nNotícias disponíveis:\n{_lista(noticias)}"}],
@@ -61,6 +61,8 @@ def escrever(noticias: list[dict], nicho: str) -> dict:
     # a resposta pode trazer blocos de "raciocínio" antes do texto; pegamos só o texto
     texto = "".join(b.text for b in resposta.content if getattr(b, "type", "") == "text")
     bloco = re.search(r"\{.*\}", texto, re.S)
+    if not bloco:
+        raise RuntimeError(f"A IA não devolveu o JSON esperado (stop_reason={resposta.stop_reason}): {texto[:300]!r}")
     dados = json.loads(bloco.group(0))
     dados["escolha"] = max(0, min(int(dados.get("escolha", 0)), len(noticias) - 1))
     dados["manchete"] = dados["manchete"].upper()[:110]
