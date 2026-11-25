@@ -21,7 +21,7 @@ def enviar_para_r2(arquivo: Path) -> str:
         aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
         region_name="auto",
     )
-    chave = f"videos/{arquivo.name}"
+    chave = f"midia/{arquivo.name}"
     tipo = "video/mp4" if arquivo.suffix == ".mp4" else "image/png"
     s3.upload_file(str(arquivo), os.environ["R2_BUCKET"], chave, ExtraArgs={"ContentType": tipo})
     return f"{os.environ['R2_PUBLIC_URL'].rstrip('/')}/{chave}"
@@ -44,7 +44,7 @@ def _texto_graphql(s: str) -> str:
     return s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
 
 
-def postar_no_buffer(texto: str, url_video: str) -> str:
+def postar_no_buffer(texto: str, url_midia: str | None = None, tipo: str = "texto") -> str:
     canal = os.environ["BUFFER_CHANNEL_ID"]
     if config.MODO == "publicar":
         # agenda para daqui a 2 minutos = publica quase na hora
@@ -53,15 +53,22 @@ def postar_no_buffer(texto: str, url_video: str) -> str:
     else:
         modo = "mode: addToQueue, saveToDraft: true"
 
+    if url_midia and tipo == "video":
+        midia = f'assets: [{{ video: {{ url: "{url_midia}" }} }}]'
+    elif url_midia and tipo == "imagem":
+        midia = f'assets: [{{ image: {{ url: "{url_midia}" }} }}]'
+    else:
+        midia = ""
+
     consulta = f'''
     mutation {{
       createPost(input: {{
         text: "{_texto_graphql(texto)}",
         channelId: "{canal}",
         schedulingType: automatic,
-        {modo},
-        assets: [{{ video: {{ url: "{url_video}" }} }}]
-      }}) {{
+        {modo}
+        {midia}
+      }})  {{
         ... on PostActionSuccess {{ post {{ id }} }}
         ... on MutationError {{ message }}
       }}

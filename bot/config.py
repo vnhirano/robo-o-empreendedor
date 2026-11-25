@@ -49,6 +49,14 @@ HORA_INICIO = 7    # primeiro post às 7h
 HORA_FIM = 23      # último post às 23h
 POSTS_POR_EXECUCAO = 1   # quantos posts a cada rodada (1 por hora = ~17 por dia)
 
+# Mistura de formatos (pesos em %). O robô sorteia um formato a cada post.
+# Mude os números para ter mais ou menos de cada tipo.
+FORMATOS = {
+    "texto": 60,    # só texto (manchete + comentário)
+    "imagem": 25,   # texto + card com a manchete
+    "video": 15,    # texto + vídeo vertical
+}
+
 # ---------------------------------------------------------------
 # 4. MODO DE OPERAÇÃO
 # ---------------------------------------------------------------

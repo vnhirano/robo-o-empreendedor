@@ -66,32 +66,32 @@ def buscar_foto(busca: str) -> Image.Image | None:
         return None
 
 
-def _cobrir(img: Image.Image) -> Image.Image:
-    escala = max(W / img.width, H / img.height)
+def _cobrir(img: Image.Image, h: int = H) -> Image.Image:
+    escala = max(W / img.width, h / img.height)
     img = img.resize((int(img.width * escala) + 1, int(img.height * escala) + 1), Image.LANCZOS)
-    x, y = (img.width - W) // 2, (img.height - H) // 2
-    return img.crop((x, y, x + W, y + H))
+    x, y = (img.width - W) // 2, (img.height - h) // 2
+    return img.crop((x, y, x + W, y + h))
 
 
-def fundo_gerado(nicho: str) -> Image.Image:
+def fundo_gerado(nicho: str, h: int = H) -> Image.Image:
     """Fundo com a identidade da marca, para quando não houver foto."""
-    base = Image.new("RGBA", (W, H), _hex(config.COR_FUNDO))
+    base = Image.new("RGBA", (W, h), _hex(config.COR_FUNDO))
     # brilho dourado no alto
-    brilho = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    brilho = Image.new("RGBA", (W, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(brilho)
-    d.ellipse((W * 0.25, -H * 0.15, W * 1.35, H * 0.45), fill=_hex(config.COR_DESTAQUE, 70))
+    d.ellipse((W * 0.25, -h * 0.15, W * 1.35, h * 0.45), fill=_hex(config.COR_DESTAQUE, 70))
     brilho = brilho.filter(ImageFilter.GaussianBlur(220))
     base = Image.alpha_composite(base, brilho)
     # grade sutil
-    grade = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    grade = Image.new("RGBA", (W, h), (0, 0, 0, 0))
     g = ImageDraw.Draw(grade)
     for x in range(0, W, 90):
-        g.line([(x, 0), (x, H)], fill=(255, 255, 255, 10), width=1)
-    for y in range(0, H, 90):
+        g.line([(x, 0), (x, h)], fill=(255, 255, 255, 10), width=1)
+    for y in range(0, h, 90):
         g.line([(0, y), (W, y)], fill=(255, 255, 255, 10), width=1)
     base = Image.alpha_composite(base, grade)
     # nome do nicho gigante, bem apagado
-    marca = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    marca = Image.new("RGBA", (W, h), (0, 0, 0, 0))
     m = ImageDraw.Draw(marca)
     tamanho = 420
     f = _fonte("Black", tamanho)
@@ -104,23 +104,23 @@ def fundo_gerado(nicho: str) -> Image.Image:
 
 
 # ------------------------------------------------------------------ FRENTE
-def camada_frente(manchete: str, linha_apoio: str, nicho: str, fonte_noticia: str) -> Image.Image:
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+def camada_frente(manchete: str, linha_apoio: str, nicho: str, fonte_noticia: str, h: int = H) -> Image.Image:
+    img = Image.new("RGBA", (W, h), (0, 0, 0, 0))
 
     # degradê escuro de baixo para cima, para o texto ficar legível em cima da foto
-    degrade = Image.new("L", (1, H), 0)
-    for y in range(H):
-        p = max(0.0, (y - H * 0.38) / (H * 0.62))
+    degrade = Image.new("L", (1, h), 0)
+    for y in range(h):
+        p = max(0.0, (y - h * 0.38) / (h * 0.62))
         degrade.putpixel((0, y), int(245 * min(1.0, p ** 0.8)))
-    sombra = Image.new("RGBA", (W, H), _hex(config.COR_FUNDO))
-    sombra.putalpha(degrade.resize((W, H)))
+    sombra = Image.new("RGBA", (W, h), _hex(config.COR_FUNDO))
+    sombra.putalpha(degrade.resize((W, h)))
     img = Image.alpha_composite(img, sombra)
     # faixa escura no topo
-    topo = Image.new("L", (1, H), 0)
+    topo = Image.new("L", (1, h), 0)
     for y in range(320):
         topo.putpixel((0, y), int(170 * (1 - y / 320)))
-    faixa = Image.new("RGBA", (W, H), (0, 0, 0, 255))
-    faixa.putalpha(topo.resize((W, H)))
+    faixa = Image.new("RGBA", (W, h), (0, 0, 0, 255))
+    faixa.putalpha(topo.resize((W, h)))
     img = Image.alpha_composite(img, faixa)
 
     d = ImageDraw.Draw(img)
@@ -146,13 +146,13 @@ def camada_frente(manchete: str, linha_apoio: str, nicho: str, fonte_noticia: st
     for tamanho in range(92, 50, -4):
         f_manchete = _fonte("Black", tamanho)
         linhas = _quebrar(manchete, f_manchete, largura_txt)
-        if len(linhas) <= 5:
+        if len(linhas) <= (5 if h >= 1700 else 4):
             break
     altura_linha = int(tamanho * 1.12)
     f_apoio = _fonte("Medium", 36)
     linhas_apoio = _quebrar(linha_apoio, f_apoio, largura_txt)[:2] if linha_apoio else []
 
-    y_fim = 1690
+    y_fim = h - 230
     y_apoio = y_fim - len(linhas_apoio) * 48
     y_manchete = y_apoio - 30 - len(linhas) * altura_linha
     y_selo = y_manchete - 90
@@ -174,11 +174,28 @@ def camada_frente(manchete: str, linha_apoio: str, nicho: str, fonte_noticia: st
     # RODAPÉ
     agora = time.gmtime(time.time() - 3 * 3600)  # horário de Brasília
     data_txt = f"{agora.tm_mday:02d} {MESES[agora.tm_mon - 1]} {agora.tm_year}"
-    d.line((margem - 36, 1770, W - 60, 1770), fill=(255, 255, 255, 50), width=2)
-    d.text((margem - 36, 1800), f"SIGA {config.ARROBA.upper()}", font=_fonte("ExtraBold", 28), fill=dourado)
+    d.line((margem - 36, h - 150, W - 60, h - 150), fill=(255, 255, 255, 50), width=2)
+    d.text((margem - 36, h - 120), f"SIGA {config.ARROBA.upper()}", font=_fonte("ExtraBold", 28), fill=dourado)
     f_data = _fonte("Medium", 26)
-    d.text((W - 60, 1800), data_txt, font=f_data, fill=cinza, anchor="ra")
+    d.text((W - 60, h - 120), data_txt, font=f_data, fill=cinza, anchor="ra")
     return img
+
+
+# ------------------------------------------------------------------ IMAGEM
+ALTURA_IMAGEM = 1350   # formato 4:5, o que mais ocupa espaço no feed do X sem ser cortado
+
+
+def gerar_imagem(textos: dict, noticia: dict, pasta_saida: Path) -> Path:
+    """Gera um card estático (1080x1350) para posts de texto + imagem."""
+    pasta_saida.mkdir(parents=True, exist_ok=True)
+    h = ALTURA_IMAGEM
+    foto = buscar_foto(textos.get("busca_imagem", ""))
+    fundo = _cobrir(foto, h) if foto else fundo_gerado(noticia["nicho"], h)
+    frente = camada_frente(textos["manchete"], textos.get("linha_apoio", ""),
+                           noticia["nicho"], noticia["fonte"], h)
+    arq = pasta_saida / f"{time.strftime('%Y%m%d-%H%M%S')}-card.png"
+    Image.alpha_composite(fundo.convert("RGBA"), frente).convert("RGB").save(arq, optimize=True)
+    return arq
 
 
 # ------------------------------------------------------------------ VÍDEO

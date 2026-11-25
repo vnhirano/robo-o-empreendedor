@@ -10,6 +10,7 @@ Uso:
   python -m bot.main --teste    -> gera um vídeo de exemplo, sem internet e sem postar
 """
 import os
+import random
 import sys
 import time
 from pathlib import Path
@@ -37,6 +38,14 @@ def nicho_da_vez() -> list[str]:
     return nichos[inicio:] + nichos[:inicio]
 
 
+def sortear_formato() -> str:
+    escolhido = os.getenv("FORMATO", "auto").lower()
+    if escolhido in config.FORMATOS:
+        return escolhido
+    nomes, pesos = zip(*config.FORMATOS.items())
+    return random.choices(nomes, weights=pesos, k=1)[0]
+
+
 def rodada_teste() -> None:
     # Textos fixos de exemplo (no uso real quem escreve é o Haiku)
     textos = {
@@ -46,8 +55,9 @@ def rodada_teste() -> None:
         "busca_imagem": "electric car charging",
     }
     video, capa = arte.gerar_video(textos, NOTICIA_TESTE, PASTA_SAIDA)
+    card = arte.gerar_imagem(textos, NOTICIA_TESTE, PASTA_SAIDA)
     print("Texto do post:\n" + redator.texto_do_post(textos, NOTICIA_TESTE))
-    print(f"\nVídeo: {video}\nCapa:  {capa}")
+    print(f"\nVídeo: {video}\nCard:  {card}")
 
 
 def rodada() -> None:
@@ -73,11 +83,20 @@ def rodada() -> None:
         texto = redator.texto_do_post(textos, noticia)
         print("Post:\n" + texto)
 
-        video, _capa = arte.gerar_video(textos, noticia, PASTA_SAIDA)
-        url = publicar.enviar_para_r2(video)
-        print("Vídeo na nuvem:", url)
-        id_post = publicar.postar_no_buffer(texto, url)
-        print(f"Enviado ao Buffer ({config.MODO}): {id_post}")
+        formato = sortear_formato()
+        print("Formato:", formato)
+        url = None
+        if formato == "video":
+            arquivo, _capa = arte.gerar_video(textos, noticia, PASTA_SAIDA)
+        elif formato == "imagem":
+            arquivo = arte.gerar_imagem(textos, noticia, PASTA_SAIDA)
+        else:
+            arquivo = None
+        if arquivo:
+            url = publicar.enviar_para_r2(arquivo)
+            print("Mídia na nuvem:", url)
+        id_post = publicar.postar_no_buffer(texto, url, formato)
+        print(f"Enviado ao Buffer ({config.MODO}, {formato}): {id_post}")
 
         noticias.salvar_no_historico(noticia["titulo"], nicho, textos["manchete"])
         feitos += 1
