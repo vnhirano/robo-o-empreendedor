@@ -21,7 +21,10 @@ Regras obrigatórias:
    juros, regras para empresas). Trate todos os partidos e governos com o mesmo critério,
    e o comentário deve focar na consequência prática para quem empreende ou investe.
 3. Sem hashtags, sem emojis e sem links.
-4. Português do Brasil, linguagem simples.
+4. Ao escolher, PREFIRA notícias de veículos conhecidos (ex.: Valor, InfoMoney, Exame, Folha,
+   Estadão, G1, CNN Brasil, Bloomberg Línea, Reuters, Poder360, Money Times). Só escolha fonte
+   pequena ou regional se for a única com a notícia.
+5. Português do Brasil, linguagem simples.
 
 Responda APENAS com um JSON válido, neste formato:
 {{
