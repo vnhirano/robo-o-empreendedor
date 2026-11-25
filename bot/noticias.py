@@ -61,6 +61,23 @@ def _baixar_feed(url: str):
         return None
 
 
+# Fontes que não são veículos de imprensa: notícias delas são descartadas
+FONTES_BLOQUEADAS = {"instagram", "facebook", "youtube", "tiktok", "x", "twitter",
+                     "linkedin", "threads", "kwai", "reddit", "medium", "blogspot"}
+
+# Nome bonito para os portais diretos (o nome do feed às vezes vem estranho)
+NOMES_FONTES = {
+    "techcrunch.com": "TechCrunch", "www.cnbc.com": "CNBC", "feeds.bbci.co.uk": "BBC",
+    "feeds.content.dowjones.io": "MarketWatch", "electrek.co": "Electrek",
+    "www.coindesk.com": "CoinDesk", "cointelegraph.com": "Cointelegraph",
+    "www.aljazeera.com": "Al Jazeera", "www.moneytimes.com.br": "Money Times",
+    "g1.globo.com": "g1", "www.infomoney.com.br": "InfoMoney", "startups.com.br": "Startups",
+    "exame.com": "Exame", "autopapo.uol.com.br": "AutoPapo", "motor1.uol.com.br": "Motor1",
+    "www.tecmundo.com.br": "TecMundo", "canaltech.com.br": "Canaltech",
+    "www.poder360.com.br": "Poder360", "livecoins.com.br": "Livecoins",
+    "portaldobitcoin.uol.com.br": "Portal do Bitcoin",
+}
+
 POR_FONTE = 4   # no máximo 4 notícias de cada fonte, para misturar Brasil e exterior
 
 
@@ -98,8 +115,11 @@ def coletar(nicho: str, limite: int = 15) -> list[dict]:
             if any(_parecido(chave, _normalizar(i["titulo"])) for i in itens):
                 continue
             do_feed += 1
-            if not fonte:  # portais diretos: usa o nome do próprio feed
-                fonte = feed.feed.get("title", "").split(" - ")[0].split(" | ")[0]
+            if not fonte:  # portais diretos: usa um nome conhecido ou o do próprio feed
+                fonte = NOMES_FONTES.get(url.split("/")[2]) or \
+                    feed.feed.get("title", "").split(" - ")[0].split(" | ")[0]
+            if fonte.strip().lower() in FONTES_BLOQUEADAS:
+                continue
             itens.append({"titulo": titulo.strip(), "fonte": fonte.strip() or "Imprensa",
                           "resumo": resumo[:400], "link": e.get("link", ""),
                           "data": time.mktime(data), "nicho": nicho})
