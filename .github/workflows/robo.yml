@@ -9,6 +9,9 @@ on:
       modo:
         description: "rascunho (vai para os rascunhos do Buffer) ou publicar"
         default: "rascunho"
+      forcar:
+        description: "sim = roda mesmo fora do horário (para testes)"
+        default: "nao"
 
 permissions:
   contents: write             # para salvar o histórico de notícias já postadas
@@ -37,6 +40,7 @@ jobs:
       - name: Rodar o robô
         env:
           MODO: ${{ github.event.inputs.modo || vars.MODO || 'rascunho' }}
+          FORCAR: ${{ github.event.inputs.forcar || 'nao' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
