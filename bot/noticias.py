@@ -32,9 +32,14 @@ def carregar_historico() -> list[dict]:
     return []
 
 
-def salvar_no_historico(titulo: str, nicho: str, manchete: str) -> None:
+def fontes_recentes(qtd: int = 2) -> set[str]:
+    """Fontes dos últimos posts, para não repetir o mesmo veículo em sequência."""
+    return {h.get("fonte", "").lower() for h in carregar_historico()[-qtd:] if h.get("fonte")}
+
+
+def salvar_no_historico(titulo: str, nicho: str, manchete: str, fonte: str = "") -> None:
     historico = carregar_historico()
-    historico.append({"titulo": titulo, "nicho": nicho, "manchete": manchete,
+    historico.append({"titulo": titulo, "nicho": nicho, "manchete": manchete, "fonte": fonte,
                       "quando": time.strftime("%Y-%m-%d %H:%M")})
     historico = historico[-500:]  # guarda só os 500 mais recentes
     ARQUIVO_HISTORICO.write_text(json.dumps({"postados": historico}, ensure_ascii=False, indent=1),
@@ -158,4 +163,9 @@ def coletar(nicho: str, limite: int = 15) -> list[dict]:
                           "resumo": resumo[:400], "link": e.get("link", ""),
                           "data": time.mktime(data), "nicho": nicho})
     itens.sort(key=lambda i: i["data"], reverse=True)
+    # evita o mesmo veículo dos 2 últimos posts (se houver alternativa)
+    recentes = fontes_recentes()
+    variados = [i for i in itens if i["fonte"].lower() not in recentes]
+    if variados:
+        itens = variados
     return itens[:limite]

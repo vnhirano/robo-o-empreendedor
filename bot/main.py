@@ -98,7 +98,7 @@ def rodada() -> None:
         id_post = publicar.postar_no_buffer(texto, url, formato)
         print(f"Enviado ao Buffer ({config.MODO}, {formato}): {id_post}")
 
-        noticias.salvar_no_historico(noticia["titulo"], nicho, textos["manchete"])
+        noticias.salvar_no_historico(noticia["titulo"], nicho, textos["manchete"], noticia["fonte"])
         feitos += 1
 
     print(f"Rodada concluída: {feitos} post(s).")
