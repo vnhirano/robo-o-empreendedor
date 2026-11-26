@@ -97,7 +97,9 @@ def escrever(noticias: list[dict], nicho: str) -> dict:
     if not bloco:
         raise RuntimeError(f"A IA não devolveu o JSON esperado (stop_reason={resposta.stop_reason}): {texto[:300]!r}")
     dados = json.loads(bloco.group(0))
-    dados["escolha"] = max(0, min(int(dados.get("escolha", 0)), len(noticias) - 1))
+    if dados.get("pular") or dados.get("escolha") is None or not dados.get("manchete"):
+        return {"pular": True}
+    dados["escolha"] = max(0, min(int(dados["escolha"]), len(noticias) - 1))
     dados["manchete"] = dados["manchete"].upper()[:110]
     return dados
 

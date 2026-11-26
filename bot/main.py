@@ -75,7 +75,11 @@ def rodada() -> None:
         print(f"[{nicho}] {len(lista)} notícias inéditas")
         if not lista:
             continue
-        textos = redator.escrever(lista, nicho)
+        try:
+            textos = redator.escrever(lista, nicho)
+        except Exception as erro:  # problema com a IA nesse tema: tenta o próximo
+            print(f"[{nicho}] erro na IA, indo para o próximo tema: {erro}")
+            continue
         if textos.get("pular"):
             print(f"[{nicho}] IA preferiu pular.")
             continue
