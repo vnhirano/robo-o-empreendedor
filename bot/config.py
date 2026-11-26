@@ -60,7 +60,6 @@ NICHOS = {
         "https://www.infomoney.com.br/negocios/feed/",
         "https://exame.com/negocios/feed/",
         _google_news_en("earnings OR acquisition OR merger OR CEO OR layoffs big tech"),
-        "https://feeds.bbci.co.uk/news/business/rss.xml",
     ],
     "AUTOMOTIVO": [
         _google_news("montadora OR carro elétrico OR lançamento carro OR mercado automotivo"),

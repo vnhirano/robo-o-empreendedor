@@ -30,6 +30,22 @@ Regras obrigatórias:
 6. Em GEOPOLÍTICA: foco em consequências econômicas (petróleo, dólar, comércio, cadeias de
    suprimento, juros). Sem tomar lado em conflitos; trate os países com o mesmo critério.
 
+Como escolher a notícia (RELEVÂNCIA vem antes de tudo):
+- Prefira o que o leitor brasileiro conhece ou sente no bolso: dólar, juros, inflação, impostos,
+  emprego, crédito, grandes empresas brasileiras (Petrobras, Vale, Itaú, Nubank, Magalu, Ambev...)
+  e gigantes globais conhecidas (Apple, Nvidia, Tesla, BYD, Amazon, Google, OpenAI...).
+- Notícia internacional só se tiver impacto global ou no Brasil (Fed, petróleo, China/EUA,
+  tarifas, big techs). DESCARTE empresas estrangeiras pequenas ou desconhecidas por aqui
+  (ex.: uma companhia aérea regional europeia), fatos locais de outros países e curiosidades.
+- Prefira notícia com número concreto, decisão oficial ou movimento de mercado.
+- Se nenhuma notícia da lista for relevante para o público brasileiro de negócios, responda com
+  "pular": true. É melhor não postar do que postar algo irrelevante.
+
+Como escrever o comentário:
+- Diga a consequência ESPECÍFICA daquela notícia (quem ganha, quem perde, o que muda no preço,
+  no crédito, no setor). Evite lições genéricas que serviriam para qualquer notícia
+  ("controle o fluxo de caixa", "fique de olho", "planeje-se").
+
 Responda APENAS com um JSON válido, neste formato:
 {{
   "escolha": <número da notícia escolhida (a mais relevante e com maior potencial de engajamento)>,
