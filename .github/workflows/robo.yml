@@ -1,46 +1,81 @@
 # Este arquivo diz ao GitHub QUANDO e COMO rodar o robô.
+#
+# COMO O "DESPERTADOR" FUNCIONA (corrente):
+#   Cada rodada posta, espera até o próximo minuto 17 e então dispara a rodada seguinte sozinha.
+#   Assim o robô não depende do agendamento do GitHub, que atrasa em repositórios novos.
+#   O agendamento (schedule) fica só como reserva: se a corrente parar, ele a religa.
+#   Repositório público = minutos ilimitados, então a espera não custa nada.
 name: Robo O Empreendedor
 
 on:
   schedule:
-    - cron: "17 * * * *"   # de hora em hora (o robô só posta das 7h às 23h, conforme o config.py)
-  workflow_dispatch:          # permite rodar na mão pelo botão "Run workflow"
+    - cron: "17 * * * *"   # reserva: religa a corrente se ela parar
+  workflow_dispatch:          # botão "Run workflow" (e a própria corrente)
     inputs:
       modo:
-        description: "rascunho (vai para os rascunhos do Buffer) ou publicar"
-        default: "rascunho"
+        description: "vazio = usa a variável MODO (padrão rascunho) | rascunho | publicar"
+        default: ""
       formato:
         description: "auto (sorteia), texto, imagem ou video"
         default: "auto"
       forcar:
         description: "sim = roda mesmo fora do horário (para testes)"
         default: "nao"
+      corrente:
+        description: "sim = continua a corrente de hora em hora depois desta rodada"
+        default: "sim"
+      pai:
+        description: "(uso interno da corrente; deixe em branco)"
+        default: ""
 
 permissions:
-  contents: write             # para salvar o histórico de notícias já postadas
-
-concurrency:
-  group: robo
-  cancel-in-progress: false
+  contents: write             # salvar o histórico de notícias já postadas
+  actions: write              # disparar a próxima rodada da corrente
 
 jobs:
   rodar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
+      - name: Verificar se já existe outra rodada em andamento
+        id: guarda
+        env:
+          PAI: ${{ github.event.inputs.pai }}
+        run: |
+          PAI=${PAI:-0}
+          OUTRAS=$(gh run list -R "$GITHUB_REPOSITORY" --workflow robo.yml --limit 20 --json databaseId,status \
+            --jq "[.[] | select((.status==\"in_progress\" or .status==\"queued\" or .status==\"waiting\") and .databaseId != $GITHUB_RUN_ID and .databaseId != $PAI)] | length")
+          echo "Outras rodadas ativas: $OUTRAS"
+          if [ "$OUTRAS" != "0" ]; then
+            # já existe uma corrente: não cria outra
+            echo "continuar=nao" >> "$GITHUB_OUTPUT"
+            # agendamento de reserva não posta se a corrente está viva; clique manual posta mesmo assim
+            if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then echo "pular=sim" >> "$GITHUB_OUTPUT"; else echo "pular=nao" >> "$GITHUB_OUTPUT"; fi
+          else
+            echo "continuar=sim" >> "$GITHUB_OUTPUT"
+            echo "pular=nao" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.guarda.outputs.pular == 'nao'
 
       - uses: actions/setup-python@v5
+        if: steps.guarda.outputs.pular == 'nao'
         with:
           python-version: "3.12"
           cache: pip
 
       - name: Instalar ffmpeg e bibliotecas
+        if: steps.guarda.outputs.pular == 'nao'
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           pip install -r requirements.txt
 
       - name: Rodar o robô
+        if: steps.guarda.outputs.pular == 'nao'
+        continue-on-error: true      # mesmo se falhar, a corrente continua
         env:
           MODO: ${{ github.event.inputs.modo || vars.MODO || 'rascunho' }}
           FORCAR: ${{ github.event.inputs.forcar || 'nao' }}
@@ -57,9 +92,21 @@ jobs:
         run: python -m bot.main
 
       - name: Salvar histórico
-        if: always()
+        if: steps.guarda.outputs.pular == 'nao'
         run: |
           git config user.name "robo-o-empreendedor"
           git config user.email "robo@users.noreply.github.com"
           git add data/postados.json
           git diff --cached --quiet || (git commit -m "histórico de posts" && git push)
+
+      - name: Esperar o próximo minuto 17 e disparar a próxima rodada
+        if: steps.guarda.outputs.continuar == 'sim' && (github.event_name == 'schedule' || github.event.inputs.corrente != 'nao')
+        run: |
+          AGORA=$(date +%s)
+          MIN=$(date +%-M); SEG=$(date +%-S)
+          ESPERA=$(( ( (17 - MIN + 60) % 60 ) * 60 - SEG ))
+          if [ "$ESPERA" -lt 600 ]; then ESPERA=$(( ESPERA + 3600 )); fi
+          echo "Próxima rodada em $(( ESPERA / 60 )) minutos."
+          sleep "$ESPERA"
+          gh workflow run robo.yml -R "$GITHUB_REPOSITORY" --ref main -f formato=auto -f forcar=nao -f corrente=sim -f pai="$GITHUB_RUN_ID"
+          echo "Próxima rodada disparada."
