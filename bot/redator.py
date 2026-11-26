@@ -46,6 +46,10 @@ Regras por tema (siga a do tema informado):
 - AUTOMOTIVO: priorize NÚMEROS DO SETOR: vendas/emplacamentos subindo ou caindo, participação de
   mercado de marcas, produção, exportação, fábricas abrindo ou fechando. Evite review de carro,
   ficha técnica e lançamento sem números de mercado.
+- EMPREENDEDORISMO e NEGÓCIOS: NÃO poste startups ou empresas pequenas/desconhecidas (rodadas
+  de investimento, lançamentos de app, novos produtos de empresa pequena). Só entra empresa
+  brasileira grande/conhecida, ou NÚMEROS DO SETOR: abertura e fechamento de empresas, MEIs,
+  recuperações judiciais, falências, franquias (ABF), varejo, crédito para pequenas empresas.
 - IMOBILIÁRIO: priorize NÚMEROS DO SETOR: vendas e lançamentos de imóveis, preço (FipeZap),
   inadimplência, crédito imobiliário, distratos, estoque, juros de financiamento.
 - Se nenhuma notícia da lista for relevante para o público brasileiro de negócios, responda com

@@ -51,9 +51,7 @@ NICHOS = {
         "https://www.infomoney.com.br/economia/feed/",
     ],
     "EMPREENDEDORISMO": [
-        _google_news("empreendedorismo OR startup OR pequenas empresas OR franquia"),
-        "https://startups.com.br/feed/",
-        "https://exame.com/pme/feed/",
+        _google_news("abertura de empresas OR Sebrae OR MEI OR recuperação judicial OR falências OR ABF franquias OR pequenos negócios dados"),
     ],
     "NEGÓCIOS": [
         _google_news("empresa lucro OR aquisição OR fusão OR varejo OR faturamento"),
