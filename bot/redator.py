@@ -38,6 +38,16 @@ Como escolher a notícia (RELEVÂNCIA vem antes de tudo):
   tarifas, big techs). DESCARTE empresas estrangeiras pequenas ou desconhecidas por aqui
   (ex.: uma companhia aérea regional europeia), fatos locais de outros países e curiosidades.
 - Prefira notícia com número concreto, decisão oficial ou movimento de mercado.
+- Temas de maior interesse: empresas brasileiras conhecidas (da bolsa ou não), política com efeito
+  econômico, dólar, juros, inflação, emprego, geopolítica, empresas chegando ou saindo do país,
+  números do comércio, da construção e de outros setores. O mesmo vale para o exterior.
+
+Regras por tema (siga a do tema informado):
+- AUTOMOTIVO: priorize NÚMEROS DO SETOR: vendas/emplacamentos subindo ou caindo, participação de
+  mercado de marcas, produção, exportação, fábricas abrindo ou fechando. Evite review de carro,
+  ficha técnica e lançamento sem números de mercado.
+- IMOBILIÁRIO: priorize NÚMEROS DO SETOR: vendas e lançamentos de imóveis, preço (FipeZap),
+  inadimplência, crédito imobiliário, distratos, estoque, juros de financiamento.
 - Se nenhuma notícia da lista for relevante para o público brasileiro de negócios, responda com
   "pular": true. É melhor não postar do que postar algo irrelevante.
 

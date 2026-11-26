@@ -62,14 +62,14 @@ NICHOS = {
         _google_news_en("earnings OR acquisition OR merger OR CEO OR layoffs big tech"),
     ],
     "AUTOMOTIVO": [
-        _google_news("montadora OR carro elétrico OR lançamento carro OR mercado automotivo"),
+        _google_news("emplacamentos OR Fenabrave OR Anfavea OR vendas de veículos OR produção de veículos OR montadora fábrica Brasil"),
         "https://autopapo.uol.com.br/feed/",
         "https://motor1.uol.com.br/rss/news/all/",
-        _google_news_en("Tesla OR BYD OR Toyota OR automaker OR electric vehicles"),
+        _google_news_en("car sales OR EV sales OR automaker sales OR Tesla deliveries OR BYD sales"),
         "https://electrek.co/feed/",
     ],
     "IMOBILIÁRIO": [
-        _google_news("mercado imobiliário OR financiamento imobiliário OR construtora OR aluguel"),
+        _google_news("lançamentos imobiliários OR vendas de imóveis OR inadimplência imobiliária OR crédito imobiliário OR Abrainc OR Secovi OR FipeZap OR construção civil"),
         "https://www.infomoney.com.br/minhas-financas/imoveis/feed/",
     ],
     "IA": [
